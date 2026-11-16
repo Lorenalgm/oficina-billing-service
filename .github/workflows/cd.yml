@@ -75,10 +75,13 @@ jobs:
         run: aws eks update-kubeconfig --region "${{ vars.AWS_REGION || 'us-east-1' }}" --name "${{ vars.EKS_CLUSTER_NAME || 'oficina-eks' }}"
 
       - name: Secret do serviço
+        env:
+          APP_KEY: ${{ secrets.APP_KEY }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           kubectl -n oficina create secret generic billing-secrets \
-            --from-literal=APP_KEY="${{ secrets.APP_KEY }}" \
-            --from-literal=DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            --from-literal=APP_KEY="$APP_KEY" \
+            --from-literal=DB_PASSWORD="$DB_PASSWORD" \
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Manifestos e migrações
