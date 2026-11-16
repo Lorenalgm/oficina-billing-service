@@ -24,6 +24,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'pagamento' => [
+        'gateway' => env('PAYMENT_GATEWAY', 'fake'),
+        'fake_falhar_estorno' => (bool) env('PAYMENT_FAKE_FALHAR_ESTORNO', false),
+    ],
+
     'resend' => [
         'key' => env('RESEND_KEY'),
     ],

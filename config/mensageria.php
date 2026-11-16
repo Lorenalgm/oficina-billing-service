@@ -27,5 +27,6 @@ return [
     'handlers' => [
         'billing.cmd.gerar-orcamento' => Application\Cobranca\GerarOrcamento::class,
         'billing.cmd.cancelar-orcamento' => Application\Cobranca\CancelarOrcamento::class,
+        'billing.cmd.cobrar' => Application\Cobranca\Cobrar::class,
     ],
 ];
