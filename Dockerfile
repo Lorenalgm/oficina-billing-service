@@ -12,8 +12,17 @@ WORKDIR /var/www
 COPY composer.json composer.lock ./
 RUN composer install --no-interaction --no-dev --no-scripts --no-autoloader
 
-COPY . .
-RUN composer dump-autoload --optimize --no-dev \
+COPY artisan ./
+COPY app ./app
+COPY bootstrap ./bootstrap
+COPY config ./config
+COPY database ./database
+COPY public ./public
+COPY resources ./resources
+COPY routes ./routes
+COPY src ./src
+RUN mkdir -p storage/app storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
+    && composer dump-autoload --optimize --no-dev \
     && chown -R www-data:www-data storage bootstrap/cache
 
 COPY docker/entrypoint.sh /entrypoint.sh
