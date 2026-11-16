@@ -12,6 +12,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(\Domain\Cobranca\OrcamentoRepository::class, \Infrastructure\Persistence\EloquentOrcamentoRepository::class);
+        $this->app->when(\Application\Cobranca\GerarOrcamento::class)->needs('$urlPublica')->giveConfig('app.url');
     }
 
     /**

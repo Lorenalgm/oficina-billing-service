@@ -24,5 +24,8 @@ return [
 
     'heartbeat_arquivo' => env('MENSAGERIA_HEARTBEAT', storage_path('framework/mensageria.heartbeat')),
 
-    'handlers' => [],
+    'handlers' => [
+        'billing.cmd.gerar-orcamento' => Application\Cobranca\GerarOrcamento::class,
+        'billing.cmd.cancelar-orcamento' => Application\Cobranca\CancelarOrcamento::class,
+    ],
 ];
