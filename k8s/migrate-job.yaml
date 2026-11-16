@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: billing-migrate
+  labels:
+    app.kubernetes.io/name: billing-migrate
+spec:
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      enableServiceLinks: false
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: ghcr.io/lorenalgm/oficina-billing-service:latest
+          imagePullPolicy: IfNotPresent
+          args: ["php", "artisan", "migrate", "--force"]
+          envFrom:
+            - configMapRef:
+                name: billing-config
+            - secretRef:
+                name: billing-secrets
