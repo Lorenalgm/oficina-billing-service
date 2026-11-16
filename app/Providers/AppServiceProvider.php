@@ -11,7 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(\Domain\Cobranca\OrcamentoRepository::class, \Infrastructure\Persistence\EloquentOrcamentoRepository::class);
     }
 
     /**
