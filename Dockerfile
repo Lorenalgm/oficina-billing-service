@@ -18,7 +18,6 @@ COPY bootstrap ./bootstrap
 COPY config ./config
 COPY database ./database
 COPY public ./public
-COPY resources ./resources
 COPY routes ./routes
 COPY src ./src
 RUN mkdir -p storage/app storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
