@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: Oficina Billing Service
+  version: 1.0.0
+  description: Orçamento e pagamento da oficina. Rotas públicas usadas pelo cliente a partir dos links enviados por e-mail.
+paths:
+  /api/orcamentos/{id}:
+    get:
+      summary: Consultar orçamento
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+        - { name: token, in: query, required: true, schema: { type: string } }
+      responses:
+        '200': { $ref: '#/components/responses/Orcamento' }
+        '401': { $ref: '#/components/responses/TokenInvalido' }
+  /api/orcamentos/{id}/aprovar:
+    post:
+      summary: Aprovar orçamento
+      description: Publica billing.evt.orcamento-aprovado para a Saga. O token é de uso único.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody: { $ref: '#/components/requestBodies/Token' }
+      responses:
+        '200': { $ref: '#/components/responses/Orcamento' }
+        '401': { $ref: '#/components/responses/TokenInvalido' }
+  /api/orcamentos/{id}/recusar:
+    post:
+      summary: Recusar orçamento
+      description: Publica billing.evt.orcamento-recusado; a Saga cancela a OS.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody: { $ref: '#/components/requestBodies/Token' }
+      responses:
+        '200': { $ref: '#/components/responses/Orcamento' }
+        '401': { $ref: '#/components/responses/TokenInvalido' }
+  /api/pagamentos/{id}/simular:
+    post:
+      summary: Simular retorno do Mercado Pago
+      description: Disponível só com PAYMENT_GATEWAY=fake. Publica pagamento-confirmado ou pagamento-recusado; repetir não publica de novo.
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [resultado]
+              properties:
+                resultado: { type: string, enum: [aprovado, recusado] }
+      responses:
+        '200':
+          description: Pagamento atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      status: { type: string, enum: [pendente, aprovado, recusado, estornado] }
+        '404': { description: Pagamento inexistente ou gateway real ativo }
+        '422': { description: Resultado inválido }
+components:
+  requestBodies:
+    Token:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [token]
+            properties:
+              token: { type: string }
+  responses:
+    Orcamento:
+      description: Orçamento
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  id: { type: integer }
+                  os_id: { type: integer }
+                  status: { type: string, enum: [pendente, aprovado, recusado, cancelado] }
+                  valor_total: { type: integer, description: Em centavos }
+                  itens:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        descricao: { type: string }
+                        quantidade: { type: integer }
+                        valor_unitario: { type: integer }
+    TokenInvalido:
+      description: Token inválido, já utilizado ou orçamento inexistente
