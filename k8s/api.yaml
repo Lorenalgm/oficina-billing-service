@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-api
+  labels:
+    app.kubernetes.io/name: billing-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: billing-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: billing-api
+    spec:
+      enableServiceLinks: false
+      containers:
+        - name: api
+          image: ghcr.io/lorenalgm/oficina-billing-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: billing-config
+            - secretRef:
+                name: billing-secrets
+          env:
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: plataforma-secrets
+                  key: RABBITMQ_BILLING_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-api
+spec:
+  selector:
+    app.kubernetes.io/name: billing-api
+  ports:
+    - port: 80
+      targetPort: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: billing-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: billing-api
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: billing-api
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /api/orcamentos
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-api
+                port:
+                  number: 80
+          - path: /api/pagamentos
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-api
+                port:
+                  number: 80
