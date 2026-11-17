@@ -104,5 +104,4 @@ jobs:
 
       - name: Smoke test
         run: |
-          kubectl -n oficina run billing-smoke --image=curlimages/curl:8.11.1 --restart=Never --rm -i --quiet \
-            --command -- curl -fsS http://billing-api/up
+          kubectl -n oficina exec deploy/billing-api -- curl -fsS http://localhost:8080/up
