@@ -84,6 +84,13 @@ jobs:
             --from-literal=DB_PASSWORD="$DB_PASSWORD" \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: URL pública
+        run: |
+          host=$(kubectl -n ingress-nginx get svc ingress-nginx-controller \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          test -n "$host"
+          sed -i "s#APP_URL: .*#APP_URL: \"http://${host}\"#" k8s/configmap.yaml
+
       - name: Manifestos e migrações
         run: |
           kubectl -n oficina delete job billing-migrate --ignore-not-found
