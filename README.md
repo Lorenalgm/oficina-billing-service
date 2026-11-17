@@ -38,7 +38,7 @@ Publicados a partir da ação do cliente: `billing.evt.orcamento-aprovado`, `bil
 
 ## Rotas
 
-Documentadas em [`openapi.yaml`](openapi.yaml). Todas públicas, protegidas pelo token do orçamento ou do pagamento:
+Documentadas no [readme.io](https://lorenalgm.readme.io/reference) (junto com as do OS e da Execução) e em [`openapi.yaml`](openapi.yaml). Não exigem login: o link enviado ao cliente vai direto ao load balancer e usa o token do orçamento. Pelo API Gateway, como toda rota `/api/*`, pedem o JWT.
 
 | Rota | Uso |
 |---|---|
