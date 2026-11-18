@@ -51,6 +51,15 @@ Documentadas no [readme.io](https://lorenalgm.readme.io/reference) (junto com as
 
 O pagamento passa pela porta `GatewayPagamento` (criar cobrança e estornar). Nesta entrega o adaptador é um **mock do Mercado Pago** (`FakeGateway`): gera o link de pagamento, e a rota `/simular` faz o papel do webhook de retorno. A escolha foi deliberada para a demonstração não depender de conta e credenciais de sandbox; um adaptador real implementa a mesma porta sem mudar handlers nem testes. `PAYMENT_FAKE_FALHAR_ESTORNO=true` faz o estorno falhar, para demonstrar a Saga em `compensacao_falhou`.
 
+## Cobertura de testes
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Lorenalgm_oficina-billing-service&metric=coverage)](https://sonarcloud.io/summary/overall?id=Lorenalgm_oficina-billing-service) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Lorenalgm_oficina-billing-service&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Lorenalgm_oficina-billing-service)
+
+- Cobertura medida no CI a cada PR, com **mínimo de 80%** (`php artisan test --coverage --min=80`); abaixo disso o PR não passa.
+- Relatório completo no [SonarCloud](https://sonarcloud.io/summary/overall?id=Lorenalgm_oficina-billing-service), com quality gate.
+- Testes unitários em `tests/Unit` e de integração em `tests/Feature` (RabbitMQ e banco reais no CI).
+- O fluxo completo da Saga é testado com BDD no [OS Service](https://github.com/Lorenalgm/oficina_mecanica/blob/main/features/saga_os.feature).
+
 ## Rodar localmente
 
 ```bash
